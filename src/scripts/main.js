@@ -3,6 +3,7 @@ import './search_bar';
 function main() {
     const baseUrl = "https://db.ygoprodeck.com/api/v7/cardinfo.php?atk=5000";
     const searchElement = document.querySelector("search-bar");
+    let isLoading = true;
 
     const getDecks = async () => {
 
@@ -13,6 +14,7 @@ function main() {
             if (responseJson.error) {
                 showResponseMessage(responseJson.message);
             } else {
+                isLoading = false;
                 renderAllDecks(responseJson.data);
             }
         } catch(error) {
@@ -30,6 +32,7 @@ function main() {
                 showResponseMessage(responseJson.message);
             } else {
                 console.log('ini responseJson data id', responseJson.data);
+                isLoading = false;
                 renderById(responseJson.data);
             }
         } catch(error) {
@@ -66,7 +69,7 @@ function main() {
         listDeckDetailElement.innerHTML = "";
 
         listDeckDetailElement.innerHTML += `
-        <table class="table table-bordered table-hover" style="color:white; width: 150%; margin-top: 20px">
+        <table class="table table-bordered table-hover" style="width: 150%; margin-top: 20px">
             <tr>
                 <th>Monster Name</th>
                 <td>: ${detailDeck.name}</td>
@@ -106,19 +109,19 @@ function main() {
         decks.forEach(deck => {
             listDeckElement.innerHTML += `
                 <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: 12px;">
-                    <div class="card bg-dark col-md-12" style="color: white">
+                    <div class="card col-md-12">
                         <div class="row col-md-10 p-2">
                         <img src="${deck.card_images[0].image_url}" alt="${deck.name} class="col-md-6" id="img"></img>
                             <div class="col-md-6 ml-2">
-                                <h1 class="col-md-12 text-center">Detail Deck</h1>
+                                <h1 class="col-md-12 text-center detail-deck">Detail Deck</h1>
                                 <div id="detail${deck.id}"></div>
                             </div>
                         </div>
                         <div class="card-body">
-                            <h5 style="color: #FFD700">${deck.name}</h5>
+                            <h4 class="deck-name">${deck.name}</h4>
                             <p>${deck.type}</p>
                         </div>
-                        <button type="button" class="btn btn-outline-success button-detail p-2" id="${deck.id}">Show Detail</button>
+                        <button type="button" class="btn button-detail p-2" id="${deck.id}">Show Detail</button>
                     </div>
                 </div>
             `;
@@ -170,6 +173,14 @@ function main() {
         });
     }
 
+    if (isLoading) {
+        const listDeckElement = document.querySelector("#listDeck");
+        listDeckElement.innerHTML = "";
+        listDeckElement.innerHTML += `
+        <div class="loader">Loading...</div>
+        `
+    }
+
     const routerId = (deckId) => {
         getDeckById(deckId);
     }
@@ -182,6 +193,19 @@ function main() {
 
     document.addEventListener("DOMContentLoaded", () => {
         getDecks();
+    });
+
+    jQuery(function( $ ){
+        $(window).scroll(function() {
+            var yPos = ( $(window).scrollTop() );
+    
+            if(yPos > 900) { // Show element after this amount of scrolled down pixels 
+    
+                $(".yourDiv").fadeIn();
+            } else {
+                $(".yourDiv").fadeOut();
+            }
+        });
     });
 }
 
